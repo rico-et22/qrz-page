@@ -1,0 +1,12 @@
+{
+  "name": "qrz-page",
+  "version": "1.0.0",
+  "description": "SO8KP QRZ.com profile bio page with dev/prod environment support",
+  "scripts": {
+    "dev": "node server.js",
+    "build": "node build.js"
+  },
+  "keywords": ["qrz", "hamradio", "so8kp"],
+  "author": "Kamil Pawlak <SO8KP>",
+  "license": "MIT"
+}

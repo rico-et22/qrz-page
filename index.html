@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SO8KP QRZ Profile Preview</title>
+  <!-- Resolves root-relative /hampages/so8kp/... paths to https://www.qrz.com during local testing -->
+  <base href="https://www.qrz.com/">
+  <style>
+    body {
+      margin: 0;
+      padding: 20px 10px;
+      background-color: #f1f5f9;
+      display: flex;
+      justify-content: center;
+    }
+  </style>
+</head>
+<body>
+  <div id="qrz-content">Loading...</div>
+
+  <script>
+    fetch('./qrz-page.html')
+      .then(res => res.text())
+      .then(html => {
+        document.getElementById('qrz-content').outerHTML = html;
+      })
+      .catch(err => {
+        document.getElementById('qrz-content').innerHTML = '<p style="color: red; font-family: sans-serif;">Failed to load qrz-page.html. Make sure a local server is running (e.g. npm run dev).</p>';
+      });
+  </script>
+</body>
+</html>
