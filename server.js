@@ -9,18 +9,22 @@ const server = http.createServer((req, res) => {
   const url = new URL(req.url, `http://localhost:${PORT}`);
   let pathname = url.pathname;
 
-  // Handle local /hampages/so8kp/ assets
-  if (pathname.startsWith("/hampages/so8kp/")) {
-    const filename = path.basename(pathname);
+  // Handle /hampages/ assets (serve locally or proxy from QRZ CDN)
+  if (pathname.startsWith("/hampages/")) {
+    const parts = pathname.split("/").filter(Boolean); // ['hampages', 'so8kp', 'filename']
+    const callsign = parts[1] || "so8kp";
+    const filename = parts.slice(2).join("/") || path.basename(pathname);
     const localPath = path.join(__dirname, filename);
 
-    if (fs.existsSync(localPath)) {
+    if (fs.existsSync(localPath) && fs.statSync(localPath).isFile()) {
       const ext = path.extname(localPath).toLowerCase();
       const mimeTypes = {
         ".png": "image/png",
         ".jpg": "image/jpeg",
         ".jpeg": "image/jpeg",
         ".webp": "image/webp",
+        ".gif": "image/gif",
+        ".svg": "image/svg+xml",
       };
       res.writeHead(200, {
         "Content-Type": mimeTypes[ext] || "application/octet-stream",
@@ -28,17 +32,26 @@ const server = http.createServer((req, res) => {
       return fs.createReadStream(localPath).pipe(res);
     } else {
       // Proxy missing images from QRZ.com live CDN
-      const qrzUrl = `https://www.qrz.com${pathname}`;
+      // QRZ S3 bio CDN is partitioned by the last letter of the callsign (e.g. so8kp -> /p/so8kp/)
+      const bucket = callsign.slice(-1).toLowerCase();
+      const qrzUrl = `https://cdn-bio.qrz.com/${bucket}/${callsign.toLowerCase()}/${filename}`;
       return https
         .get(
           qrzUrl,
-          { headers: { "User-Agent": "Mozilla/5.0" } },
+          {
+            headers: {
+              "User-Agent":
+                "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+              Referer: `https://www.qrz.com/db/${callsign.toUpperCase()}`,
+            },
+          },
           (proxyRes) => {
             res.writeHead(proxyRes.statusCode, proxyRes.headers);
             proxyRes.pipe(res);
           },
         )
-        .on("error", () => {
+        .on("error", (err) => {
+          console.error(`Failed to proxy asset ${pathname}:`, err.message);
           res.writeHead(404);
           res.end("Not found");
         });

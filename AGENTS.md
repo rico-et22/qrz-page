@@ -8,7 +8,7 @@ This document outlines architectural rules, technical constraints, and developer
 
 - **Single Source of Truth**: The main source code is [qrz-page.html](file:///Users/kamil/www/qrz-page/qrz-page.html).
 - **Two-Environment Workflow**:
-  - **Dev**: Run `pnpm dev` (`node server.js`). `server.js` serves [qrz-page.html](file:///Users/kamil/www/qrz-page/qrz-page.html) directly, serving local `emoji_*.png` files from disk and proxying `/hampages/so8kp/*` photo assets from `https://www.qrz.com`.
+  - **Dev**: Run `pnpm dev` (`node server.js`). `server.js` serves [qrz-page.html](file:///Users/kamil/www/qrz-page/qrz-page.html) directly, serving local `emoji_*.png` files from disk and proxying `/hampages/so8kp/*` photo assets from `https://cdn-bio.qrz.com/p/so8kp/*`.
   - **Build**: Run `pnpm build` (`node build.js`). It validates MySQL UTF-8 safety, writes [dist/qrz-page.html](file:///Users/kamil/www/qrz-page/dist/qrz-page.html), and executes `pbcopy` on macOS.
 
 ---
