@@ -38,9 +38,10 @@ Failure to follow these rules will cause QRZ.com to truncate or break the entire
 - **The Issue**: Accidentally placing Tailwind classes like `tracking-tight;` in `style="..."` breaks CKEditor's `CKEDITOR.tools.parseCssText()`.
 - **The Solution**: Always verify that all inline CSS declarations strictly follow `property: value;`.
 
-### ⚠️ RULE 5: Asset URL Convention
+### ⚠️ RULE 5: Asset URL Convention & Filename Sanitization
 - Use root-relative paths for all assets: `/hampages/so8kp/[filename]`.
 - Do not use `https://cdn-bio.qrz.com/...` directly (returns HTTP 403 Forbidden).
+- **Filename Sanitization on Upload**: QRZ's image manager sanitizes filenames upon upload, converting hyphens (`-`) to underscores (`_`) (e.g. `pzk-polska.png` becomes `pzk_polska.png`). Always use underscores instead of hyphens for asset filenames to ensure they match what QRZ CDN serves.
 
 ---
 
